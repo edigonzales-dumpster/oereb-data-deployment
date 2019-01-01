@@ -1,0 +1,100 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        maven {
+            url "http://jars.interlis.ch"
+        }
+        maven {
+            url "http://download.osgeo.org/webdav/geotools/"
+        }
+        mavenCentral()
+        jcenter()
+    }
+}
+
+plugins {
+  id "ch.so.agi.gretl" version "1.0.5-SNAPSHOT"
+}
+
+import ch.so.agi.gretl.tasks.*
+import ch.so.agi.gretl.api.TransferSet
+
+ext {
+    dbUriEdit = "jdbc:postgresql://192.168.50.8/edit"
+    dbUserEdit = "ddluser"
+    dbPwdEdit = "ddluser"
+    dbUriOereb = "jdbc:postgresql://192.168.50.8/edit"
+    dbUserOereb = "ddluser"
+    dbPwdOereb = "ddluser"
+
+    dbSchemaOereb = "agi_oereb"
+    dbSchemaOerebStaging = "agi_oereb_staging"
+    dbSchemaOerebNutzungsplanung = "arp_npl_oereb_staging"
+
+    iliModelNutzungsplanung = 'SO_Nutzungsplanung_20171118'
+}
+
+def GROUP = "Initialisierung Datenbanken"
+
+task createSchemaOereb(type: Ili2pgImportSchema) {
+    description = "Erstellt das OEREB-Produktions-Datenbankschema."
+    group = GROUP
+    database = [dbUriOereb, dbUserOereb, dbPwdOereb]
+    models = iliModelNutzungsplanung
+    dbschema = dbSchemaOereb
+    nameByTopic = true
+    createFk = true
+    createFkIdx = true
+    createGeomIdx = true
+    createUnique = true
+    createNumChecks = true
+    createEnumTabs = true
+    createBasketCol = true
+    createDatasetCol = true
+    sqlEnableNull = false
+    strokeArcs = true
+    defaultSrsCode = 2056
+    disableValidation = true
+}
+
+task createSchemaOerebStaging(type: Ili2pgImportSchema) {
+    description = "Erstellt das OEREB-Staging-Datenbankschema."
+    group = GROUP
+    database = [dbUriOereb, dbUserOereb, dbPwdOereb]
+    models = iliModelNutzungsplanung
+    dbschema = dbSchemaOerebStaging
+    nameByTopic = true
+    createFk = true
+    createFkIdx = true
+    createGeomIdx = true
+    createUnique = true
+    createNumChecks = true
+    createEnumTabs = true
+    createBasketCol = true
+    createDatasetCol = true
+    sqlEnableNull = false
+    strokeArcs = true
+    defaultSrsCode = 2056
+    disableValidation = true
+}
+
+task createSchemaOerebNutzungsplanungStaging(type: Ili2pgImportSchema) {
+    description = "Erstellt für die Nutzungsplanung in der Edit-DB ein OEREB-Datenbankschema. Aus diesem Staging-Schema wird die Transferstruktur exportiert."
+    group = GROUP
+    database = [dbUriEdit, dbUserEdit, dbPwdEdit]
+    models = iliModelNutzungsplanung
+    dbschema = dbSchemaOerebNutzungsplanung
+    nameByTopic = true
+    createFk = true
+    createFkIdx = true
+    createGeomIdx = true
+    createUnique = true
+    createNumChecks = true
+    createEnumTabs = true
+    createBasketCol = true
+    createDatasetCol = true
+    strokeArcs = true
+    sqlEnableNull = true
+    defaultSrsCode = 2056
+    disableValidation = true
+}

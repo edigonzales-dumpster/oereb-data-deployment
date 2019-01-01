@@ -1,5 +1,9 @@
 # oereb-data-deployment
 
+## gretl
+Job für das einmalige Initialiseren (Anlegen der Schemas) in der Vagrant-DB. Nicht Bestandteil der Pipeline.
+
+
 Jenkins:
 admin / Ziegler15
 stefan / Ziegler15

@@ -14,22 +14,63 @@ buildscript {
 
 plugins {
   id "ch.so.agi.gretl" version "1.0.5-SNAPSHOT"
+  id "de.undercouch.download" version "3.4.3"
 }
 
 import ch.so.agi.gretl.tasks.*
 import ch.so.agi.gretl.api.TransferSet
+import java.nio.file.Paths
 
 ext {
-    dbUriEdit = "jdbc:postgresql://geodb.verw.rootso.org:5432/sogis"
-    dbUserEdit = "mspublic"
-    dbPwdEdit = "mspublic"
-    dbUriOereb = "jdbc:postgresql://192.168.50.8/sogis"
+    dbUriEdit = "jdbc:postgresql://192.168.50.8/edit"
+    dbUserEdit = "ddluser"
+    dbPwdEdit = "ddluser"
+    dbUriOereb = "jdbc:postgresql://192.168.50.8/edit"
     dbUserOereb = "ddluser"
     dbPwdOereb = "ddluser"
+
+    dbSchemaOerebNutzungsplanungStaging = "arp_npl_oereb_staging" // NPL-Daten in der Edit-DB im ÖREB-Datenmodell 
+    dbSchemaOerebStaging = "agi_oereb_staging" // Staging-Schema in der ÖREB-DB für Verifikation ("User Acceptance Test")
+    dbSchemaOereb = "agi_oereb" // Finales Schema mit produktiven ÖREB-Daten in der ÖREB-DB. Daten dürfen erst nach Verifikation (=manueller Prozess) hierhin kopiert werden.
+
+    iliModelNutzungsplanung = 'SO_Nutzungsplanung_20171118' // Gefaked mit unserem Nutzungsplanungsmodell.
+
+    // Download-Verzeichnis
+    pathToTempFolder = System.getProperty("java.io.tmpdir")
+    pathToUnzipFolder = Paths.get(pathToTempFolder, 'unzip_data')
 }
 
 task fubar() {
     doLast {
         println "Hallo Welt."
     }
+}
+
+task downloadCantonalLandUsePlansData_2502(type: Download) {
+    src "https://s3.eu-central-1.amazonaws.com/ch.so.arp.nutzungsplanung/2502.zip"
+    dest pathToTempFolder
+    overwrite true
+
+    doLast {
+        println "File downloaded to: " + pathToTempFolder
+    }        
+}
+
+task unzipCantonalLandUsePlansData_2502(type: Copy, dependsOn: downloadCantonalLandUsePlansData_2502) {
+    from zipTree(Paths.get(pathToTempFolder, "2502.zip"))
+    into file(pathToUnzipFolder)
+    include "**/*.xtf"
+
+    doLast {
+        println "File unzipped to directory: " + pathToUnzipFolder
+    }        
+}
+
+task replaceCantonalLandUsePlansData_2502(type: Ili2pgReplace, dependsOn: unzipCantonalLandUsePlansData_2502) {
+    database = [dbUriEdit, dbUserEdit, dbPwdEdit]
+    models = iliModelNutzungsplanung
+    dbschema = dbSchemaOerebNutzungsplanungStaging
+    dataFile = file(Paths.get(pathToUnzipFolder.toString(), "2502.xtf"))
+    dataset = "2502"
+    disableValidation = true
 }
