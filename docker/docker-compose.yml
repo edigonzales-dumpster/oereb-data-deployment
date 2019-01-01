@@ -1,0 +1,37 @@
+version: '3.1'
+
+services:
+    reverseproxy:
+        image: my_reverseproxy
+        build:
+            context: ./reverseproxy
+            dockerfile: Dockerfile
+        container_name: my_reverseproxy
+        ports:
+            - 80:80
+        restart: always
+
+    jenkins:
+        depends_on:
+            - reverseproxy
+        image: jenkinsci/blueocean:1.8.4
+        user: root
+        ports:
+            - 8080:8080 
+            - 50000:50000
+        volumes:
+            - /Users/stefan/Docker/jenkins_home:/var/jenkins_home
+            - /var/run/docker.sock:/var/run/docker.sock
+        environment:
+            - JENKINS_OPTS="--prefix=/jenkins"
+        restart: always
+
+    artifactory:
+        depends_on:
+            - reverseproxy
+        image: docker.bintray.io/jfrog/artifactory-oss:latest
+        ports:
+            - 8081:8081 
+        volumes:
+            - /Users/stefan/Docker/artifactory:/var/opt/jfrog/artifactory
+        restart: always

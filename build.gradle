@@ -1,0 +1,35 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        maven {
+            url "http://jars.interlis.ch"
+        }
+        maven {
+            url "http://download.osgeo.org/webdav/geotools/"
+        }
+        mavenCentral()
+        jcenter()
+    }
+}
+
+plugins {
+  id "ch.so.agi.gretl" version "1.0.5-SNAPSHOT"
+}
+
+import ch.so.agi.gretl.tasks.*
+import ch.so.agi.gretl.api.TransferSet
+
+ext {
+    dbUriEdit = "jdbc:postgresql://geodb.verw.rootso.org:5432/sogis"
+    dbUserEdit = "mspublic"
+    dbPwdEdit = "mspublic"
+    dbUriOereb = "jdbc:postgresql://192.168.50.8/sogis"
+    dbUserOereb = "ddluser"
+    dbPwdOereb = "ddluser"
+}
+
+task fubar() {
+    doLast {
+        println "Hallo Welt."
+    }
+}
