@@ -29,7 +29,7 @@ ext {
 
     dbSchemaOereb = "agi_oereb"
     dbSchemaOerebStaging = "agi_oereb_staging"
-    dbSchemaOerebNutzungsplanung = "arp_npl_oereb_staging"
+    dbSchemaOerebNutzungsplanungStaging = "arp_npl_oereb_staging"
 
     iliModelNutzungsplanung = 'SO_Nutzungsplanung_20171118'
 }
@@ -83,7 +83,7 @@ task createSchemaOerebNutzungsplanungStaging(type: Ili2pgImportSchema) {
     group = GROUP
     database = [dbUriEdit, dbUserEdit, dbPwdEdit]
     models = iliModelNutzungsplanung
-    dbschema = dbSchemaOerebNutzungsplanung
+    dbschema = dbSchemaOerebNutzungsplanungStaging
     nameByTopic = true
     createFk = true
     createFkIdx = true

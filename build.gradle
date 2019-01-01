@@ -20,6 +20,7 @@ plugins {
 import ch.so.agi.gretl.tasks.*
 import ch.so.agi.gretl.api.TransferSet
 import java.nio.file.Paths
+import java.nio.file.Files
 
 ext {
     dbUriEdit = "jdbc:postgresql://192.168.50.8/edit"
@@ -36,7 +37,7 @@ ext {
     iliModelNutzungsplanung = 'SO_Nutzungsplanung_20171118' // Gefaked mit unserem Nutzungsplanungsmodell.
 
     // Download-Verzeichnis
-    pathToTempFolder = System.getProperty("java.io.tmpdir")
+    pathToTempFolder = Files.createTempDirectory(Paths.get(System.getProperty("java.io.tmpdir")), "oereb_data_deployment_").toFile().getAbsolutePath()
     pathToUnzipFolder = Paths.get(pathToTempFolder, 'unzip_data')
 }
 
@@ -74,3 +75,19 @@ task replaceCantonalLandUsePlansData_2502(type: Ili2pgReplace, dependsOn: unzipC
     dataset = "2502"
     disableValidation = true
 }
+
+/* 
+ * Now this is what we wanna test. Each line/bullet is one pipeline step:
+ * 1. Export a dataset.
+ * 2. Copy it to???
+ * 3. Import it into the staging schema.
+ * 4. Waiting for approval.
+ * 5. Import it into productive schema.
+ * 6. ...
+ */
+ // TODO: 
+ // - What happens with the data in the staging schema if it does not get approved? Delete the dataset in database?
+
+
+ 
+
