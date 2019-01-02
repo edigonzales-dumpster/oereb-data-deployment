@@ -37,6 +37,7 @@ ext {
     dbSchemaOereb = "agi_oereb" // Finales Schema mit produktiven ÖREB-Daten in der ÖREB-DB. Daten dürfen erst nach Verifikation (=manueller Prozess) hierhin kopiert werden.
 
     iliModelNutzungsplanung = 'SO_Nutzungsplanung_20171118' // Gefaked mit unserem Nutzungsplanungsmodell.
+    iliModelAmtlicheVermessung = 'DM01AVCH24LV95D'
 
     // Download-Verzeichnis
     pathToTempFolder = Files.createTempDirectory(Paths.get(System.getProperty("java.io.tmpdir")), "oereb_data_deployment_").toFile().getAbsolutePath()
@@ -55,11 +56,11 @@ ext {
 // 1. Nachgeführte Daten exportieren.
 task exportLandUsePlansDataset(type: Ili2pgExport) {
     database = [dbUriEdit, dbUserEdit, dbPwdEdit]
-    models = iliModelNutzungsplanung
+    models = iliModelAmtlicheVermessung
     dbschema = dbSchemaOerebNutzungsplanungStaging
     //dataFile = file(Paths.get(pathToTempFolder.toString(), exportFileName))
     dataFile = exportFileName
-    dataset = "2502"
+    dataset = "2549"
     disableValidation = true
 
     doLast {
@@ -71,10 +72,10 @@ task exportLandUsePlansDataset(type: Ili2pgExport) {
 // -Pxtf=<path/to/file.xtf>
 task importLandUsePlansDataSetToOerebStaging(type: Ili2pgReplace) {
     database = [dbUriOereb, dbUserOereb, dbPwdOereb]
-    models = iliModelNutzungsplanung
+    models = iliModelAmtlicheVermessung
     dbschema = dbSchemaOerebStaging
     dataFile = xtf
-    dataset = "2502"
+    dataset = "2549"
     disableValidation = true
 }
 
@@ -83,10 +84,10 @@ task importLandUsePlansDataSetToOerebStaging(type: Ili2pgReplace) {
 // -Pxtf=<path/to/file.xtf>
 task importLandUsePlansDataSetToOerebProduction(type: Ili2pgReplace) {
     database = [dbUriOereb, dbUserOereb, dbPwdOereb]
-    models = iliModelNutzungsplanung
+    models = iliModelAmtlicheVermessung
     dbschema = dbSchemaOereb
     dataFile = xtf
-    dataset = "2502"
+    dataset = "2549"
     disableValidation = true
 }
 

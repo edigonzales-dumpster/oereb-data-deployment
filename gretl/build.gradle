@@ -35,6 +35,7 @@ ext {
     dbSchemaOerebNutzungsplanungStaging = "arp_npl_oereb_staging"
 
     iliModelNutzungsplanung = 'SO_Nutzungsplanung_20171118'
+    iliModelAmtlicheVermessung = 'DM01AVCH24LV95D'
 
     // Download-Verzeichnis
     pathToTempFolder = Files.createTempDirectory(Paths.get(System.getProperty("java.io.tmpdir")), "oereb_data_deployment_").toFile().getAbsolutePath()
@@ -47,7 +48,7 @@ task createSchemaOereb(type: Ili2pgImportSchema) {
     description = "Erstellt das OEREB-Produktions-Datenbankschema."
     group = GROUP
     database = [dbUriOereb, dbUserOereb, dbPwdOereb]
-    models = iliModelNutzungsplanung
+    models = iliModelAmtlicheVermessung
     dbschema = dbSchemaOereb
     nameByTopic = true
     createFk = true
@@ -68,7 +69,7 @@ task createSchemaOerebStaging(type: Ili2pgImportSchema) {
     description = "Erstellt das OEREB-Staging-Datenbankschema."
     group = GROUP
     database = [dbUriOereb, dbUserOereb, dbPwdOereb]
-    models = iliModelNutzungsplanung
+    models = iliModelAmtlicheVermessung
     dbschema = dbSchemaOerebStaging
     nameByTopic = true
     createFk = true
@@ -89,7 +90,7 @@ task createSchemaOerebNutzungsplanungStaging(type: Ili2pgImportSchema) {
     description = "Erstellt für die Nutzungsplanung in der Edit-DB ein OEREB-Datenbankschema. Aus diesem Staging-Schema wird die Transferstruktur exportiert."
     group = GROUP
     database = [dbUriEdit, dbUserEdit, dbPwdEdit]
-    models = iliModelNutzungsplanung
+    models = iliModelAmtlicheVermessung
     dbschema = dbSchemaOerebNutzungsplanungStaging
     nameByTopic = true
     createFk = true
@@ -101,14 +102,14 @@ task createSchemaOerebNutzungsplanungStaging(type: Ili2pgImportSchema) {
     createBasketCol = true
     createDatasetCol = true
     strokeArcs = true
-    sqlEnableNull = true
+    sqlEnableNull = false
     defaultSrsCode = 2056
     disableValidation = true
 }
 
-task downloadCantonalLandUsePlansData_2502(type: Download) {
+task downloadCantonalLandUsePlansData_2549(type: Download) {
     group = GROUP
-    src "https://s3.eu-central-1.amazonaws.com/ch.so.arp.nutzungsplanung/2502.zip"
+    src "http://geoweb.so.ch/av_datenabgabe/av_daten/itf_ch/ch_254900.zip"
     dest pathToTempFolder
     overwrite true
 
@@ -117,24 +118,24 @@ task downloadCantonalLandUsePlansData_2502(type: Download) {
     }        
 }
 
-task unzipCantonalLandUsePlansData_2502(type: Copy, dependsOn: downloadCantonalLandUsePlansData_2502) {
+task unzipCantonalLandUsePlansData_2549(type: Copy, dependsOn: downloadCantonalLandUsePlansData_2549) {
     group = GROUP
-    from zipTree(Paths.get(pathToTempFolder, "2502.zip"))
+    from zipTree(Paths.get(pathToTempFolder, "ch_254900.zip"))
     into file(pathToUnzipFolder)
-    include "**/*.xtf"
+    include "**/*.itf"
 
     doLast {
         println "File unzipped to directory: " + pathToUnzipFolder
     }        
 }
 
-task replaceCantonalLandUsePlansData_2502(type: Ili2pgReplace, dependsOn: unzipCantonalLandUsePlansData_2502) {
+task replaceCantonalLandUsePlansData_2549(type: Ili2pgReplace, dependsOn: unzipCantonalLandUsePlansData_2549) {
     group = GROUP
     database = [dbUriEdit, dbUserEdit, dbPwdEdit]
-    models = iliModelNutzungsplanung
+    models = iliModelAmtlicheVermessung
     dbschema = dbSchemaOerebNutzungsplanungStaging
-    dataFile = file(Paths.get(pathToUnzipFolder.toString(), "2502.xtf"))
-    dataset = "2502"
+    dataFile = file(Paths.get(pathToUnzipFolder.toString(), "ch_254900.itf"))
+    dataset = "2549"
     disableValidation = true
 }
 
