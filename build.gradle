@@ -44,41 +44,54 @@ ext {
 
     // Dateinamen des exportierten Datensatzes.
     exportBaseFileName = "ch.so.arp.nutzungsplanung.oereb"
-    //Date now = new Date()
-    //SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd_HHmmss")
-    //exportFileName = exportBaseFileName + "_" + ft.format(now) + ".xtf"
     exportFileName = exportBaseFileName + ".xtf"
+
+    // Filename-Parameter für Import in die ÖREB-DB (Staging und Produktion)
+    // Wird in der Jenkinspipeline übergeben. Kann aber auch normal über CLI 
+    // verwendet werden.
+    setNonExistingPropertyToUndefinedValue('xtf')
 }
 
-task fubar() {
-    doLast {
-        println "Hallo Welt."
-    }
-}
-
-/* 
- * Now this is what we wanna test. Each line/bullet is one pipeline step:
- * 1. Export a dataset.
- * 2. Copy it to???
- * 3. Import it into the staging schema.
- * 4. Waiting for approval.
- * 5. Import it into productive schema.
- * 6. ...
- */
- // TODO: 
- // - What happens with the data in the staging schema if it does not get approved? Delete the dataset in database?
-
+// 1. Nachgeführte Daten exportieren.
 task exportLandUsePlansDataset(type: Ili2pgExport) {
     database = [dbUriEdit, dbUserEdit, dbPwdEdit]
     models = iliModelNutzungsplanung
     dbschema = dbSchemaOerebNutzungsplanungStaging
     //dataFile = file(Paths.get(pathToTempFolder.toString(), exportFileName))
     dataFile = exportFileName
-    logFile = "ili2pg.log"
+    dataset = "2502"
     disableValidation = true
 
     doLast {
         println "Name of exported file: " + dataFile
+    }
+}
+
+// 2. Nachgeführte Daten in das Staging-Schema der ÖREB-DB importieren.
+// -Pxtf=<path/to/file.xtf>
+task importLandUsePlansDataSetToOerebStaging(type: Ili2pgReplace) {
+    database = [dbUriOereb, dbUserOereb, dbPwdOereb]
+    models = iliModelNutzungsplanung
+    dbschema = dbSchemaOerebStaging
+    dataFile = xtf
+    dataset = "2502"
+    disableValidation = true
+}
+
+task fubar() {
+    doLast {
+        println "******"
+        println xtf
+    }
+}
+
+def setNonExistingPropertyToUndefinedValue(propertyName) {
+    setNonExistingPropertyToDefaultValue(propertyName, 'UNDEFINED')
+}
+
+def setNonExistingPropertyToDefaultValue(propertyName, defaultValue) {
+    if (!project.hasProperty(propertyName)) {
+        ext[propertyName] = defaultValue
     }
 }
 
