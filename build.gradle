@@ -44,9 +44,10 @@ ext {
 
     // Dateinamen des exportierten Datensatzes.
     exportBaseFileName = "ch.so.arp.nutzungsplanung.oereb"
-    Date now = new Date()
-    SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd_HHmmss")
-    exportFileName = exportBaseFileName + "_" + ft.format(now) + ".xtf"
+    //Date now = new Date()
+    //SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd_HHmmss")
+    //exportFileName = exportBaseFileName + "_" + ft.format(now) + ".xtf"
+    exportFileName = exportBaseFileName + ".xtf"
 }
 
 task fubar() {

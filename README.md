@@ -10,3 +10,6 @@ stefan / Ziegler15
 
 
 ae5facdd7f214e65a64a075d550cbceb
+
+copyArtifacts plugin
+pipeline-utility-steps-plugin
