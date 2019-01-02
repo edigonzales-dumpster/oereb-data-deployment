@@ -71,7 +71,8 @@ task exportLandUsePlansDataset(type: Ili2pgExport) {
     database = [dbUriEdit, dbUserEdit, dbPwdEdit]
     models = iliModelNutzungsplanung
     dbschema = dbSchemaOerebNutzungsplanungStaging
-    dataFile = file(Paths.get(pathToTempFolder.toString(), exportFileName))
+    //dataFile = file(Paths.get(pathToTempFolder.toString(), exportFileName))
+    dataFile = exportFileName
     logFile = "ili2pg.log"
     disableValidation = true
 
