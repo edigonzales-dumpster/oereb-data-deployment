@@ -78,6 +78,19 @@ task importLandUsePlansDataSetToOerebStaging(type: Ili2pgReplace) {
     disableValidation = true
 }
 
+// 3. Nachgeführte Daten in das Produktions-Schema der ÖREB-DB importieren.
+// NACH Verifikation der Daten im Staging-Schema
+// -Pxtf=<path/to/file.xtf>
+task importLandUsePlansDataSetToOerebProduction(type: Ili2pgReplace) {
+    database = [dbUriOereb, dbUserOereb, dbPwdOereb]
+    models = iliModelNutzungsplanung
+    dbschema = dbSchemaOereb
+    dataFile = xtf
+    dataset = "2502"
+    disableValidation = true
+}
+
+
 task fubar() {
     doLast {
         println "******"
