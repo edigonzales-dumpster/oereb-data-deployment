@@ -21,6 +21,8 @@ import ch.so.agi.gretl.tasks.*
 import ch.so.agi.gretl.api.TransferSet
 import java.nio.file.Paths
 import java.nio.file.Files
+import java.util.Date
+import java.text.SimpleDateFormat
 
 ext {
     dbUriEdit = "jdbc:postgresql://192.168.50.8/edit"
@@ -40,7 +42,11 @@ ext {
     pathToTempFolder = Files.createTempDirectory(Paths.get(System.getProperty("java.io.tmpdir")), "oereb_data_deployment_").toFile().getAbsolutePath()
     pathToUnzipFolder = Paths.get(pathToTempFolder, 'unzip_data')
 
-    exportFileName = "ch.so.arp.nutzungsplanung.oereb.xtf"
+    // Dateinamen des exportierten Datensatzes.
+    exportBaseFileName = "ch.so.arp.nutzungsplanung.oereb"
+    Date now = new Date()
+    SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd_HHmmss")
+    exportFileName = exportBaseFileName + "_" + ft.format(now) + ".xtf"
 }
 
 task fubar() {
@@ -62,12 +68,21 @@ task fubar() {
  // - What happens with the data in the staging schema if it does not get approved? Delete the dataset in database?
 
 task exportLandUsePlansDataset(type: Ili2pgExport) {
+    doFirst {
+        Date now = new Date()
+        SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd_HHmmss")
+        exportFileName = exportBaseFileName + "_" + ft.format(now) + ".xtf"
+    }
     database = [dbUriEdit, dbUserEdit, dbPwdEdit]
     models = iliModelNutzungsplanung
     dbschema = dbSchemaOerebNutzungsplanungStaging
     dataFile = exportFileName
     logFile = "ili2pg.log"
     disableValidation = true
+
+    doLast {
+        println "Name of exported file: " + dataFile
+    }
 }
 
 
